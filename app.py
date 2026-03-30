@@ -43,20 +43,16 @@ H_den_val = st.session_state["H_den"]
 s_teste_val = st.session_state["s_teste_str"]
 
 try:
-    # Preparação do sistema
     s = sp.symbols('s')
     K, w = sp.symbols('K w', real=True)
 
-    # Construir polinômios a partir das strings
     G_num = sp.sympify(G_num_val)
     G_den = sp.sympify(G_den_val)
     H_num = sp.sympify(H_num_val)
     H_den = sp.sympify(H_den_val)
 
-    # Ponto de teste
     s_teste = complex(s_teste_val) if s_teste_val.strip() != "" else None
 
-    # Sistema
     G = G_num / G_den
     H = H_num / H_den
     P = sp.simplify(G * H)
@@ -204,7 +200,6 @@ try:
         eq_s1 = rh_table[grau - 1][0]
         st.write("**Cálculo do Ganho Crítico:** Igualar linha $s^1$ a zero:")
         
-        # Pega apenas o numerador da expressão para evitar travar o SymPy com frações complexas
         eq_s1_num = sp.fraction(sp.cancel(eq_s1))[0]
         st.latex(sp.latex(eq_s1_num) + " = 0")
         
@@ -213,17 +208,14 @@ try:
             k_validos = []
             
             for k in k_crit_vals:
-                # Converte para complexo do Python para acessar .real e .imag com segurança
                 k_val = complex(k.evalf())
                 
-                # Verifica se é um número real (parte imaginária quase zero) e positivo
                 if abs(k_val.imag) < 1e-6 and k_val.real > 0:
                     k_validos.append(k_val.real)
                     
             if k_validos:
                 for k_val in k_validos:
                     st.code(f"K crítico = {k_val:.4f}", language='text')
-                    # Garante que os coeficientes da linha s^2 sejam tratados como floats reais
                     linha_s2_A = float(sp.re(rh_table[grau - 2][0].subs(K, k_val).evalf()))
                     linha_s2_B = float(sp.re(rh_table[grau - 2][1].subs(K, k_val).evalf()))
                     w2 = linha_s2_B / linha_s2_A
@@ -237,7 +229,7 @@ try:
                 st.info("Não há ganho crítico positivo (o LGR não cruza o eixo imaginário para K > 0).")
                 
         except Exception as e:
-            # Imprimir o 'e' ajuda muito a debugar se acontecer com outros sistemas!
+
             st.error(f"Não foi possível resolver algebricamente. Erro: {e}")
 
 
@@ -355,7 +347,6 @@ try:
         fig = plt.figure(figsize=(8, 6))
         ct.root_locus(sys, grid=True)
         
-        # Resolve o alerta do matplotlib sobre conflict de aspect ratio "Ignoring fixed x limits..."
         fig.gca().set_adjustable("datalim")
 
         if s_teste is not None:
