@@ -203,22 +203,42 @@ try:
 
         eq_s1 = rh_table[grau - 1][0]
         st.write("**Cálculo do Ganho Crítico:** Igualar linha $s^1$ a zero:")
-        st.latex(sp.latex(eq_s1) + " = 0")
+        
+        # Pega apenas o numerador da expressão para evitar travar o SymPy com frações complexas
+        eq_s1_num = sp.fraction(sp.cancel(eq_s1))[0]
+        st.latex(sp.latex(eq_s1_num) + " = 0")
+        
         try:
-            k_crit_vals = sp.solve(eq_s1, K)
-            k_validos = [float(k.evalf()) for k in k_crit_vals if k.evalf() > 0]
+            k_crit_vals = sp.solve(eq_s1_num, K)
+            k_validos = []
+            
+            for k in k_crit_vals:
+                # Converte para complexo do Python para acessar .real e .imag com segurança
+                k_val = complex(k.evalf())
+                
+                # Verifica se é um número real (parte imaginária quase zero) e positivo
+                if abs(k_val.imag) < 1e-6 and k_val.real > 0:
+                    k_validos.append(k_val.real)
+                    
             if k_validos:
                 for k_val in k_validos:
                     st.code(f"K crítico = {k_val:.4f}", language='text')
-                    linha_s2_A = rh_table[grau - 2][0].subs(K, k_val)
-                    linha_s2_B = rh_table[grau - 2][1].subs(K, k_val)
-                    w2 = float(linha_s2_B / linha_s2_A)
+                    # Garante que os coeficientes da linha s^2 sejam tratados como floats reais
+                    linha_s2_A = float(sp.re(rh_table[grau - 2][0].subs(K, k_val).evalf()))
+                    linha_s2_B = float(sp.re(rh_table[grau - 2][1].subs(K, k_val).evalf()))
+                    w2 = linha_s2_B / linha_s2_A
+                    
                     st.write("**Frequência de Oscilação:** (Substituindo K na linha $s^2$)")
-                    st.code(f"{linha_s2_A:.4f}s^2 + {linha_s2_B:.4f} = 0  =>  s = ± {np.sqrt(w2):.4f}j", language='text')
+                    if w2 > 0:
+                        st.code(f"{linha_s2_A:.4f}s^2 + {linha_s2_B:.4f} = 0  =>  s = ± {np.sqrt(w2):.4f}j", language='text')
+                    else:
+                        st.warning("O LGR não cruza o eixo em frequência real para este K.")
             else:
-                st.info("Não há ganho crítico positivo.")
+                st.info("Não há ganho crítico positivo (o LGR não cruza o eixo imaginário para K > 0).")
+                
         except Exception as e:
-            st.error("Não foi possível resolver algebricamente.")
+            # Imprimir o 'e' ajuda muito a debugar se acontecer com outros sistemas!
+            st.error(f"Não foi possível resolver algebricamente. Erro: {e}")
 
 
     with abas[5]:
