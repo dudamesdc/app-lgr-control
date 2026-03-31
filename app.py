@@ -301,7 +301,7 @@ try:
             st.markdown(f"$\\Sigma\\phi - \\Sigma\\theta = {soma_ang_zeros:.2f}^\\circ - {soma_ang_polos:.2f}^\\circ = {ang_total_bruto:.2f}^\\circ$")
             st.markdown(f"Ângulo normalizado: **{ang_total_norm:.2f}°**")
             
-            if abs(abs(ang_total_norm) - 180) < 5.0 or abs(ang_total_norm) < 5.0:
+            if abs(abs(ang_total_norm) - 180) < 10.0 or abs(ang_total_norm) < 10.0:
                 st.success(f"O ângulo resultante ({ang_total_norm:.2f}°) satisfaz a condição de ângulo. O ponto **PERTENCE** ao LGR!")
                 
                 st.subheader("Passo 12: Critério do Módulo")
