@@ -1,4 +1,4 @@
-# Análise Passo a Passo do Lugar das Raízes (LGR)
+# Análise Passo a Passo do Lugar Geométrico das Raízes (LGR)
 
 Esta é uma aplicação web construída com Python e Streamlit. Ela calcula automaticamente e explica o processo passo a passo para encontrar o Lugar das Raízes de um Sistema de Controle.
 
